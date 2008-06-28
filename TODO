@@ -1,0 +1,8 @@
++ write a complete RDFa equivalent of the RDF/XML from the CC Wiki
++ generate unit tests that differ in a way of embedding identical RDF data
++ introduce a way to check the isomorphism of any given RDF graphs (one would
+  be the reference graph and the other would be the outcome of parsing)
+- write a parser that will extract the RDF data from RDF/XML and RDFa
+- parse the extracted RDF information to obtain license metadata
+- cope with ill-formed mark-up
+- parse RSS feeds
