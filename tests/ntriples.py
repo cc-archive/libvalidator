@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
 N-Triples Parser
-License: GPL 2, W3C, BSD, or MIT
-Author: Sean B. Palmer, inamidst.com
+Copyright 2004, Sean B. Palmer, inamidst.com
+Licensed under GPL 2, W3C, BSD, MIT, or EFL 2
 Documentation: 
    http://inamidst.com/proj/rdf/ntriples-doc
 

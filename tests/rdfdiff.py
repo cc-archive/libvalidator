@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 """
 RDF Graph Isomorphism Tester
-Author: Sean B. Palmer, inamidst.com
+Copyright 2004, Sean B. Palmer, inamidst.com
+Licensed under the Eiffel Forum License 2
+
 Uses the pyrple algorithm
 Requirements: 
    Python2.4+
    http://inamidst.com/proj/rdf/ntriples.py
+
 Usage: ./rdfdiff.py <ntriplesP> <ntriplesQ>
 """
 
