@@ -242,8 +242,8 @@ s('link', 'head', {'rel' : 'license', 'type' : 'application/rdf+xml', 'href' : l
 s('a', 'div', {'rel' : 'license', 'type' : 'application/rdf+xml', 'href' : license['embedded']})
 
 # RDF in an object
-s('object', 'div', {'type' : 'application/rdf+xml', 'href' : rdf['external']})
-s('object', 'div', {'type' : 'application/rdf+xml', 'href' : rdf['embedded']})
+s('object', 'div', {'type' : 'application/rdf+xml', 'data' : rdf['external']})
+s('object', 'div', {'type' : 'application/rdf+xml', 'data' : rdf['embedded']})
 
 # RDF in a comment
 d.appendChild(d.createComment(rdf['plain']))
