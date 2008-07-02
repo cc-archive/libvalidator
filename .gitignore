@@ -1,0 +1,9 @@
+bin
+build
+develop-eggs
+dist
+eggs
+libvalidator.egg-info
+*.pyc
+.coverage
+.installed.cfg
