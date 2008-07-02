@@ -1,0 +1,50 @@
+Deprecated methods:
+* a/link rel="meta" to external/embedded rdf+xml
+* meta name="DC.rights"
+* plain application/rdf+xml as an element
+* plain application/rdf+xml as a comment
+
+Recommended methods:
+* RDFa/microformat
+
+Bonus features:
+* RSS 1.0
+  http://wiki.creativecommons.org/RSS_1.0
+* RSS 2.0
+  http://wiki.creativecommons.org/RSS_2.0
+* Atom
+  http://wiki.creativecommons.org/Atom
+
+Not required:
+* object data to external/embedded application/rdf+xml
+* meta name="License" with the name of a license or a hyperlink
+* meta name="License_URI" with a hyperlink
+* application/rdf+xml as a script
+* Embed XML RDF Part II: Embrace Validation
+  http://lists.w3.org/Archives/Public/www-archive/2002Jun/att-0002/01-index#embedAndValidate
+* HyperRDF
+  http://lists.w3.org/Archives/Public/www-archive/2002Jun/att-0002/01-index#hyperrdf
+* Augmented Metadata for XHTML
+  http://lists.w3.org/Archives/Public/www-archive/2002Jun/att-0002/01-index#augmeta
+* Making use of XML Notations
+  http://infomesh.net/2002/rdfinhtml/#notations
+* <a href="http://creativecommons.org/licenses/by-nc-nd/2.0/" xmlns:cc="http://cc.org/ns#" rel="cc:license">...</a>
+* rel="copyright"
+* rel="alternate"
+
+Important notes:
+* the document and/or embedded/external XML files do not have to be encoded as UTF-8
+* rdf+xml does not have to have the "rdf" prefix
+* the external RDF does not have to have any file extension at all
+* application/rdf+xml (.rdf) is not the ony way to express RDF; text/rdf+n3;charset=utf-8 (.n3), application/x-turtle;charset=utf-8 (.ttl), text/plain;charset=us-ascii (.nt)
+* need to take care of base URI (xml:base, codebase, base, content-location)
+* RDFa includes CURIEs
+* both rel and type attributes are optional
+* "rel" accepts a space-separated list of link types, so it is perfectly fine to use rel="appendix license", for instance
+* link types are case-insensitive
+* multiple links with the same relation are possible
+* the second rel="license" is to be interpretted as rel="alternative license"
+* the RDF does not have to specify the license of the document it is embedded in
+* urllib can parse data: URLs
+* prevent accessing local files e.g. href="/etc/passwd" when parsing a file that has been uploaded or submitted directly
+* paulproteus says that BeautifulSoup can turn valid code into an invalid one
