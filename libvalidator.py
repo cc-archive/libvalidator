@@ -112,5 +112,3 @@ for (elements, attribute) in (
 # migrate to minidom?
 
 print metadataURI
-
-#print _urljoin('http://www.chessbase.com/one.html', 'blue.html')
