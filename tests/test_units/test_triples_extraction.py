@@ -8,4 +8,4 @@ class TestTriplesExtraction():
         pass
     
     def test_negative(self):
-        return False
+        assert False
