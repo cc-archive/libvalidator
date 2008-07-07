@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import nose.tools
 
 class TestTriplesExtraction():
     def __init__(self, *args, **kargs):
@@ -8,4 +9,6 @@ class TestTriplesExtraction():
         pass
     
     def test_negative(self):
-        assert False
+        def blow_up():
+            assert False
+        nose.tools.assert_raises(AssertionError, blow_up)
