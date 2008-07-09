@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-import re, urlparse
-#from tidy import parseString
+import re, urlparse, StringIO, os
+from xml.dom import minidom
+from xml.dom.ext import c14n
+from xml.parsers.expat import ExpatError
 from BeautifulSoup import BeautifulSoup
 
 class libvalidator():
     def __init__(self, *args, **kargs):
-        pass
+        self.reRDF = re.compile('<([^\s]+)\s+(?:[^>]+\s+)?xmlns(?::[^=]+)?\s*=\s*(?:("http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#")|(\'http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#\')).*</\1\s*>')
     """
     No CURIE support
     """
@@ -18,7 +20,7 @@ class libvalidator():
             self.baseURI = element['href']
         elif search:
             self.baseURI = search.group(1)
-        elif location:
+        elif self.location:
             self.baseURI = self.location
     def findBaseElement(self, element):
         if element.name.lower() == 'object':
@@ -43,4 +45,14 @@ class libvalidator():
         if headers is not None:
             self.headers = headers
         self.findBaseDocument()
-        # incomplete
+        try:
+            dom = minidom.parseString(code)
+        except ExpatError, err:
+            dom = minidom.parseString(str(BeautifulSoup(code)))
+        code = c14n.Canonicalize(dom, comments=True)
+        print code
+        """
+        for m in re.finditer(self.reRDF, code):
+            print 'RDF/XML found:'
+            print m
+        """

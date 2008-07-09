@@ -10,7 +10,7 @@ from rdfdiff import compare_from_string
 
 class TestTriplesExtraction():
     def __init__(self, *args, **kargs):
-        parser = libvalidator()
+        self.parser = libvalidator()
         self.rdfa = re.sub('\s+', ' ', """\
 <div xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <div about="http://example.org/gnomophone.mp3" typeof="cc:Work">
@@ -195,6 +195,8 @@ class TestTriplesExtraction():
     def test_rdfxml_comment(self):
         self.document_reset()
         self.document.appendChild(self.document.createComment(self.rdf['plain']))
+        self.document.getElementsByTagName('div').item(0).appendChild(self.document.createCDATASection('<rdf:RDF'))
+        self.parser.parse(self.document.toxml(), 'http://www.example.org/', '')
         assert False
     def test_rdfa(self):
         self.document_reset()
