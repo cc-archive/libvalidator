@@ -169,37 +169,47 @@ class TestTriplesExtraction():
             element.appendChild(self.document.createTextNode('bar'))
         self.document.getElementsByTagName(mountPoint).item(0).appendChild(element)
         return element
+    def parse(self):
+        self.parser.parse(self.document.toxml(), 'http://www.example.org/', '')
     def test_a_meta_embedded(self):
         self.document_reset()
         self.document_append('a', 'div', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['embedded']})
+        self.parse()
         assert False
     def test_a_meta_external(self):
         self.document_reset()
         self.document_append('a', 'div', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['external']})
+        self.parse()
         assert False
     def test_link_meta_embedded(self):
         self.document_reset()
         self.document_append('link', 'head', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['embedded']})
+        self.parse()
         assert False
     def test_link_meta_external(self):
         self.document_reset()
         self.document_append('link', 'head', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['external']})
+        self.parse()
         assert False
     def test_meta_dc(self):
         self.document_reset()
+        # FIXME
+        self.parse()
         assert False
     def test_rdfxml_element(self):
         self.document_reset()
         self.document.getElementsByTagName('head').item(0).appendChild(self.document.importNode(minidom.parseString(self.rdf['plain']).documentElement, True))
+        self.parse()
         assert False
     def test_rdfxml_comment(self):
         self.document_reset()
         self.document.appendChild(self.document.createComment(self.rdf['plain']))
         self.document.getElementsByTagName('div').item(0).appendChild(self.document.createCDATASection('<rdf:RDF'))
-        self.parser.parse(self.document.toxml(), 'http://www.example.org/', '')
+        self.parse()
         assert False
     def test_rdfa(self):
         self.document_reset()
         self.document.getElementsByTagName('div').item(0).appendChild(self.document.importNode(minidom.parseString(self.rdfa).documentElement, True))
+        self.parse()
         assert False
     
