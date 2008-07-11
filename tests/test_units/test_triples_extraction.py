@@ -169,31 +169,59 @@ class TestTriplesExtraction():
             element.appendChild(self.document.createTextNode('bar'))
         self.document.getElementsByTagName(mountPoint).item(0).appendChild(element)
         return element
+    def document_profile(self):
+        head = self.document.getElementsByTagName('head').item(0)
+        head.setAttribute('profile', 'http://dublincore.org/documents/dcq-html/')
+        link = self.document.createElement('link')
+        link.setAttribute('rel', 'schema.DC')
+        link.setAttribute('href', 'http://purl.org/dc/elements/1.1/')
+        children = head.getElementsByTagName('*')
+        if (children.length > 0):
+            head.insertBefore(link, children.item(0))
+        else:
+            head.appendChild(link)
     def parse(self):
         self.parser.parse(self.document.toxml(), 'http://www.example.org/', '')
     def test_a_meta_embedded(self):
         self.document_reset()
-        self.document_append('a', 'div', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['embedded']})
+        self.document_append('a', 'div', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['embedded']})
         self.parse()
         assert False
     def test_a_meta_external(self):
         self.document_reset()
-        self.document_append('a', 'div', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['external']})
+        self.document_append('a', 'div', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['external']})
         self.parse()
         assert False
     def test_link_meta_embedded(self):
         self.document_reset()
-        self.document_append('link', 'head', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['embedded']})
+        self.document_append('link', 'head', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['embedded']})
         self.parse()
         assert False
     def test_link_meta_external(self):
         self.document_reset()
-        self.document_append('link', 'head', {'rel' : 'meta', 'type' : 'application/rdf+xml', 'href' : self.rdf['external']})
+        self.document_append('link', 'head', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['external']})
         self.parse()
         assert False
-    def test_meta_dc(self):
+    def test_meta_dc_meta_name(self):
         self.document_reset()
-        # FIXME
+        self.document_profile()
+        for k, v in self.metadata[0].iteritems():
+            options = {'name': k, 'content': v}
+            if v.startswith('http://'):
+                options['scheme'] = 'DCTERMS.URI'
+            self.document_append('meta', 'head', options)
+        self.parse()
+        assert False
+    def test_meta_dc_link_link(self):
+        self.document_reset()
+        self.document_profile()
+        for k, v in self.metadata[1].iteritems():
+            if v.startswith('http://'):
+                options = {'rel': k, 'href': v}
+                self.document_append('link', 'head', options)
+            else:
+                options = {'name': k, 'content': v}
+                self.document_append('meta', 'head', options)
         self.parse()
         assert False
     def test_rdfxml_element(self):
