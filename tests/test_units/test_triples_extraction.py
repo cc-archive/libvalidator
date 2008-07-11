@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import nose.tools
-import urllib, re
+import urllib, re, os
+from urlparse import urljoin
 from libvalidator import libvalidator
 from xml.dom import minidom
 from pyRdfa import _process_DOM, Options
@@ -11,6 +12,7 @@ from rdfdiff import compare_from_string
 class TestTriplesExtraction():
     def __init__(self, *args, **kargs):
         self.parser = libvalidator()
+        self.baseURI = 'tests/test_units/test.html'
         self.rdfa = re.sub('\s+', ' ', """\
 <div xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <div about="http://example.org/gnomophone.mp3" typeof="cc:Work">
@@ -157,6 +159,13 @@ class TestTriplesExtraction():
   </body>
 </html>
 """).replace('> <', '><')
+        f = open(urljoin(self.baseURI, self.rdf['external']), 'w')
+        f.write(self.rdf['plain'])
+        f.close()
+    def __del__(self):
+        path = urljoin(self.baseURI, self.rdf['external'])
+        if os.path.exists(path):
+            os.remove(path)
     def document_reset(self):
         self.document = minidom.parseString(self.template)
     def document_append(self, elementName, mountPoint='head', attributes={}, textContent=None):
@@ -181,27 +190,32 @@ class TestTriplesExtraction():
         else:
             head.appendChild(link)
     def parse(self):
-        self.parser.parse(self.document.toxml(), 'http://www.example.org/', '')
+        self.result = self.parser.parse(self.document.toxml(), self.baseURI, '')
+    def assert_external(self):
+        assert 'http://artlibre.org/licence/lal/en/' in self.result['licensedObjects']['http://example.org/gnomophone.mp3'] \
+           and 'http://creativecommons.org/licenses/by-nc-nd/2.0/' in self.result['licensedObjects']['http://example.org/gnomophone.mp3']
+    def assert_internal(self):
+        assert 'http://creativecommons.org/licenses/by-nc-nd/2.0/' in self.result['licensedObjects'][self.baseURI]
     def test_a_meta_embedded(self):
         self.document_reset()
         self.document_append('a', 'div', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['embedded']})
         self.parse()
-        assert False
+        self.assert_external()
     def test_a_meta_external(self):
         self.document_reset()
         self.document_append('a', 'div', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['external']})
         self.parse()
-        assert False
+        self.assert_external()
     def test_link_meta_embedded(self):
         self.document_reset()
         self.document_append('link', 'head', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['embedded']})
         self.parse()
-        assert False
+        self.assert_external()
     def test_link_meta_external(self):
         self.document_reset()
         self.document_append('link', 'head', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['external']})
         self.parse()
-        assert False
+        self.assert_external()
     def test_meta_dc_meta_name(self):
         self.document_reset()
         self.document_profile()
@@ -211,7 +225,7 @@ class TestTriplesExtraction():
                 options['scheme'] = 'DCTERMS.URI'
             self.document_append('meta', 'head', options)
         self.parse()
-        assert False
+        self.assert_internal()
     def test_meta_dc_link_link(self):
         self.document_reset()
         self.document_profile()
@@ -223,21 +237,21 @@ class TestTriplesExtraction():
                 options = {'name': k, 'content': v}
                 self.document_append('meta', 'head', options)
         self.parse()
-        assert False
+        self.assert_internal()
     def test_rdfxml_element(self):
         self.document_reset()
         self.document.getElementsByTagName('head').item(0).appendChild(self.document.importNode(minidom.parseString(self.rdf['plain']).documentElement, True))
         self.parse()
-        assert False
+        self.assert_external()
     def test_rdfxml_comment(self):
         self.document_reset()
         self.document.appendChild(self.document.createComment(self.rdf['plain']))
         self.document.getElementsByTagName('div').item(0).appendChild(self.document.createCDATASection('<rdf:RDF'))
         self.parse()
-        assert False
+        self.assert_external()
     def test_rdfa(self):
         self.document_reset()
         self.document.getElementsByTagName('div').item(0).appendChild(self.document.importNode(minidom.parseString(self.rdfa).documentElement, True))
         self.parse()
-        assert False
+        self.assert_external()
     
