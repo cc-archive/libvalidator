@@ -194,8 +194,6 @@ class TestTriplesExtraction():
     def assert_external(self):
         assert 'http://artlibre.org/licence/lal/en/' in self.result['licensedObjects']['http://example.org/gnomophone.mp3'] \
            and 'http://creativecommons.org/licenses/by-nc-nd/2.0/' in self.result['licensedObjects']['http://example.org/gnomophone.mp3']
-    def assert_internal(self):
-        assert 'http://creativecommons.org/licenses/by-nc-nd/2.0/' in self.result['licensedObjects'][self.baseURI]
     def test_a_meta_embedded(self):
         self.document_reset()
         self.document_append('a', 'div', {'rel': 'meta', 'type': 'application/rdf+xml', 'href': self.rdf['embedded']})
@@ -225,7 +223,8 @@ class TestTriplesExtraction():
                 options['scheme'] = 'DCTERMS.URI'
             self.document_append('meta', 'head', options)
         self.parse()
-        self.assert_internal()
+        assert 'Available to subscribers only under Creative Commons Attribution-Noncommercial-No Derivative Works 2.0 Generic' in self.result['licensedObjects'][self.baseURI] \
+           and 'http://creativecommons.org/licenses/by-nc-nd/2.0/' in self.result['licensedObjects'][self.baseURI]
     def test_meta_dc_link_link(self):
         self.document_reset()
         self.document_profile()
@@ -237,7 +236,7 @@ class TestTriplesExtraction():
                 options = {'name': k, 'content': v}
                 self.document_append('meta', 'head', options)
         self.parse()
-        self.assert_internal()
+        assert 'http://creativecommons.org/licenses/by-nc-nd/2.0/' in self.result['licensedObjects'][self.baseURI]
     def test_rdfxml_element(self):
         self.document_reset()
         self.document.getElementsByTagName('head').item(0).appendChild(self.document.importNode(minidom.parseString(self.rdf['plain']).documentElement, True))
