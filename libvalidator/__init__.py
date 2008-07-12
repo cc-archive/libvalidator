@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import re, urlparse, urllib, os
 from xml.dom import minidom
-from xml.dom.ext import c14n
 from xml.parsers.expat import ExpatError
 from BeautifulSoup import BeautifulSoup
 from pyRdfa import _process_DOM, Options
 from pyRdfa.transform.DublinCore import DC_transform
-import rdflib
+import rdflib, c14n
 
 class URLOpener(urllib.FancyURLopener):
     def http_error_404(*args, **kwargs):
