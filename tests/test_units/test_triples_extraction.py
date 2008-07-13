@@ -5,9 +5,6 @@ from urlparse import urljoin
 from libvalidator import libvalidator
 from xml.dom import minidom
 from pyRdfa import _process_DOM, Options
-from rdflib.Graph import ConjunctiveGraph
-from rdflib.FileInputSource import FileInputSource
-from rdfdiff import compare_from_string
 
 class TestTriplesExtraction():
     def __init__(self, *args, **kargs):
@@ -245,7 +242,6 @@ class TestTriplesExtraction():
     def test_rdfxml_comment(self):
         self.document_reset()
         self.document.appendChild(self.document.createComment(self.rdf['plain']))
-        self.document.getElementsByTagName('div').item(0).appendChild(self.document.createCDATASection('<rdf:RDF'))
         self.parse()
         self.assert_external()
     def test_rdfa(self):
