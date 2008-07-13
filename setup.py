@@ -8,7 +8,7 @@ setup(
     install_requires=['setuptools',
                       'nose',
                       'html5lib',
-                      'rdflib',
+                      'rdflib == 2.4.0',
                       'pyRdfa',
                       'chardet',
                       'BeautifulSoup'
