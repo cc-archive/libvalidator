@@ -39,9 +39,15 @@ class libvalidator():
             dom = minidom.parseString(code)
         return c14n.Canonicalize(dom, comments = True)
     def extractLicensedObjects(self, code, base):
-        code = self.canonicalization(code)
+        try:
+            code = self.canonicalization(code)
+        except ExpatError, err:
+            return False
         graph = rdflib.ConjunctiveGraph()
-        graph.parse(rdflib.StringInputSource(code))
+        try:
+            graph.parse(rdflib.StringInputSource(code))
+        except SAXParseException, err:
+            return False
         for row in graph.query('SELECT ?a ?b WHERE { { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
             try:
                 self.result['licensedObjects'][str(row[0])]
@@ -93,3 +99,8 @@ class libvalidator():
             self.extractLicensedObjects(source, base)
         return self.result
         # aside of the licensed objects, gather information about licenses themselves
+
+    def parseLicense(self, sample):
+        # name, external XHTML, external RDF/XML, embedded
+        # <link rel="alternate" type="application/rdf+xml" href="rdf" />
+        pass
