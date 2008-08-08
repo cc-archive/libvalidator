@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 '''XML Canonicalization
 
+Replaced cStringIO and StringIO with a dummy class to resolve the problem with
+Unicode strings.
+
 This module generates canonical XML of a document or element.
     http://www.w3.org/TR/2001/REC-xml-c14n-20010315
 and includes a prototype of exclusive canonicalization
@@ -45,11 +48,23 @@ except:
     class XMLNS:
         BASE = "http://www.w3.org/2000/xmlns/"
         XML = "http://www.w3.org/XML/1998/namespace"
+
+"""
 try:
     import cStringIO
     StringIO = cStringIO
 except ImportError:
     import StringIO
+"""
+
+class StringIO:
+    class StringIO:
+        def __init__(self):
+            self.buf = ''
+        def write(self, s):
+            self.buf = self.buf + s
+        def getvalue(self):
+            return self.buf
 
 _attrs = lambda E: (E.attributes and E.attributes.values()) or []
 _children = lambda E: E.childNodes or []

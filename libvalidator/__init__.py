@@ -2,10 +2,11 @@
 import re, urlparse, urllib, os
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
+from xml.sax._exceptions import SAXParseException
 from BeautifulSoup import BeautifulSoup
 from pyRdfa import _process_DOM, Options
 from pyRdfa.transform.DublinCore import DC_transform
-import rdflib, c14n
+import rdflib, tidy, c14n
 
 class URLOpener(urllib.FancyURLopener):
     def http_error_404(*args, **kwargs):
@@ -34,9 +35,19 @@ class libvalidator():
         try:
             dom = minidom.parseString(code)
         except ExpatError, err:
-            code = str(BeautifulSoup(code))
-            # the following can raise ExpatError again
+            code = unicode(BeautifulSoup(code)).encode('utf-8')
+        try:
             dom = minidom.parseString(code)
+        except ExpatError, err:
+            options = dict(output_xml=1, numeric_entities=1, quote_nbsp=1,
+                           add_xml_decl=1, indent=0, tidy_mark=0,
+                           input_encoding='utf8', output_encoding='ascii',
+                           hide_comments=1)
+            code = unicode(tidy.parseString(code, **options)).encode('utf-8')
+        try:
+            dom = minidom.parseString(code)
+        except ExpatError, err:
+            return False
         return c14n.Canonicalize(dom, comments = True)
     def extractLicensedObjects(self, code, base):
         try:
@@ -103,4 +114,15 @@ class libvalidator():
     def parseLicense(self, sample):
         # name, external XHTML, external RDF/XML, embedded
         # <link rel="alternate" type="application/rdf+xml" href="rdf" />
-        pass
+        sample = sample.strip()
+        reHyperlink = re.compile('^(?:data:|((ftp|gopher|https?)://))\S+$', re.IGNORECASE)
+        if reHyperlink.search(sample) is not None:
+            # FIXME cache
+            try:
+                f = URLOpener().open(sample)
+                code = f.read()
+            except IOError, err:
+                return False
+        else:
+            code = sample
+        
