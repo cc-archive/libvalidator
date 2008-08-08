@@ -42,7 +42,7 @@ class libvalidator():
             options = dict(output_xml=1, numeric_entities=1, quote_nbsp=1,
                            add_xml_decl=1, indent=0, tidy_mark=0,
                            input_encoding='utf8', output_encoding='ascii',
-                           hide_comments=1)
+                           hide_comments=0)
             code = unicode(tidy.parseString(code, **options)).encode('utf-8')
         try:
             dom = minidom.parseString(code)
@@ -125,4 +125,15 @@ class libvalidator():
                 return False
         else:
             code = sample
+        soup = BeautifulSoup(code)
+        rel = re.compile('(?:^alternate)\s+|(?:^alternate$)|\s+(?:alternate$)', re.IGNORECASE)
+        links = soup.findAll(re.compile('^(?:a|link)$', re.IGNORECASE),
+                             {'rel': rel, 'type': 'application/rdf+xml', 'href': lambda(value): value is not None})
+        print code
+        print '+++'
+        print soup
+        print '---'
+        print repr(links)
+                                
+        
         
