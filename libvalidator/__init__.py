@@ -126,14 +126,7 @@ class libvalidator():
         else:
             code = sample
         soup = BeautifulSoup(code)
-        rel = re.compile('(?:^alternate)\s+|(?:^alternate$)|\s+(?:alternate$)', re.IGNORECASE)
+        rel = re.compile('(?:^alternate\s+)|(?:\s+alternate\s+)|(?:^alternate$)|(?:\s+alternate$)', re.IGNORECASE)
         links = soup.findAll(re.compile('^(?:a|link)$', re.IGNORECASE),
                              {'rel': rel, 'type': 'application/rdf+xml', 'href': lambda(value): value is not None})
-        print code
-        print '+++'
-        print soup
-        print '---'
-        print repr(links)
-                                
-        
         
