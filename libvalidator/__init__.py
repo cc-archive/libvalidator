@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import re, urlparse, urllib, os
+import re, os, urlparse, urllib, hashlib
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 from xml.sax._exceptions import SAXParseException
@@ -18,9 +18,10 @@ class libvalidator():
                            'dc': rdflib.Namespace('http://purl.org/dc/elements/1.1/'),
                            'xhv': rdflib.Namespace('http://www.w3.org/1999/xhtml/vocab#')}
         self.baseURI = ''
-        self.result = {'licensedObjects': {}}
+        self.result = {'licensedObjects': {}, 'licenses': {}}
     def findBaseDocument(self):
         # FIXME no CURIE support (low priority)
+        # FIXME no xml:base support (low priority)
         for e in self.dom.getElementsByTagName('base'):
             if e.hasAttribute('href'):
                 self.baseURI = e.getAttribute('href')
@@ -31,6 +32,23 @@ class libvalidator():
             self.baseURI = search.group(1)
         elif self.location:
             self.baseURI = self.location
+    def findBaseForElement(self, base, element):
+        # FIXME no CURIE support (low priority)
+        if element.name.lower() == 'object':
+            try:
+                return element['codebase']
+            except:
+                pass
+        try:
+            return element['xml:base']
+        except:
+            node = element
+            while node:
+                search = node.findParent(attrs={'xml:base' : lambda(value): value is not None})
+                if search:
+                    return search['xml:base']
+                node = node.parent
+        return base        
     def canonicalization(self, code):
         try:
             dom = minidom.parseString(code)
@@ -78,7 +96,17 @@ class libvalidator():
             # a literal
             else:
                 self.result['licensedObjects'][str(row[0])].append(str(row[1]))
-                
+    def extractLicenseInformation(self, code, base):
+        try:
+            code = self.canonicalization(code)
+        except ExpatError, err:
+            return False
+        graph = rdflib.ConjunctiveGraph()
+        try:
+            graph.parse(rdflib.StringInputSource(code))
+        except SAXParseException, err:
+            return False
+        # FIXME body of the method
     def parse(self, code, location = None, headers = None):
         if location is not None:
             self.location = location
@@ -101,6 +129,7 @@ class libvalidator():
                 f = URLOpener().open(row[0])
                 # FIXME no MIME type detection (we assume it must be application/rdf+xml as yet)
                 if not unicode(row[0]).startswith('data:'):
+                    # FIXME ignores the Content-Location in the HTTP header
                     sources.append([str(row[0]), f.read()])
                 else:
                     sources.append([self.baseURI, f.read()])
@@ -110,17 +139,23 @@ class libvalidator():
             self.extractLicensedObjects(source, base)
         return self.result
         # aside of the licensed objects, gather information about licenses themselves
-
-    def parseLicense(self, sample):
+    def parseLicense(self, sample, location):
         # name, external XHTML, external RDF/XML, embedded
         # <link rel="alternate" type="application/rdf+xml" href="rdf" />
+        # calculate hashes
         sample = sample.strip()
+        headers = ''
         reHyperlink = re.compile('^(?:data:|((ftp|gopher|https?)://))\S+$', re.IGNORECASE)
         if reHyperlink.search(sample) is not None:
             # FIXME cache
             try:
-                f = URLOpener().open(sample)
+                opener = URLOpener()
+                filename, headers = opener.retrieve(sample)
+                f = open(filename, 'r')
                 code = f.read()
+                f.close()
+                opener.close()
+                externalLocation = sample
             except IOError, err:
                 return False
         else:
@@ -129,4 +164,30 @@ class libvalidator():
         rel = re.compile('(?:^alternate\s+)|(?:\s+alternate\s+)|(?:^alternate$)|(?:\s+alternate$)', re.IGNORECASE)
         links = soup.findAll(re.compile('^(?:a|link)$', re.IGNORECASE),
                              {'rel': rel, 'type': 'application/rdf+xml', 'href': lambda(value): value is not None})
-        
+        licenses = []
+        if len(links) == 0:
+            licenses.append([location, sample])
+        else:
+            element = soup.find('base', {'href': lambda(value): value is not None})
+            reContentLocation = re.compile('(?:^|\s+)Content\-Location\s*:\s*(\S+)', re.IGNORECASE)
+            search = reContentLocation.search(unicode(headers))
+            if element:
+                base = element['href']
+            elif search:
+                base = search.group(1)
+            elif location:
+                base = externalLocation
+            for link in links:
+                try:
+                    url = urlparse.urljoin(self.findBaseForElement(base, link), link['href'])
+                    f = URLOpener().open(url)
+                    if not link['href'].startswith('data:'):
+                        # FIXME ignores the Content-Location in the HTTP header
+                        licenses.append([url, f.read()])
+                    else:
+                        licenses.append([base, f.read()])
+                    f.close()
+                except IOError:
+                    pass
+            for (base, source) in licenses:
+                self.extractLicenseInformation(source, base)
