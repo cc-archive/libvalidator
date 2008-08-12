@@ -7,6 +7,8 @@ from BeautifulSoup import BeautifulSoup
 from pyRdfa import _process_DOM, Options
 from pyRdfa.transform.DublinCore import DC_transform
 import rdflib, tidy, c14n
+import cc.license
+from cc.license.lib.exceptions import CCLicenseError
 
 class URLOpener(urllib.FancyURLopener):
     def http_error_404(*args, **kwargs):
@@ -48,7 +50,7 @@ class libvalidator():
                 if search:
                     return search['xml:base']
                 node = node.parent
-        return base        
+        return base
     def canonicalization(self, code):
         try:
             dom = minidom.parseString(code)
@@ -66,7 +68,7 @@ class libvalidator():
             dom = minidom.parseString(code)
         except ExpatError, err:
             return False
-        return c14n.Canonicalize(dom, comments = True)
+        return unicode(c14n.Canonicalize(dom, comments = True))
     def extractLicensedObjects(self, code, base):
         try:
             code = self.canonicalization(code)
@@ -74,7 +76,7 @@ class libvalidator():
             return False
         graph = rdflib.ConjunctiveGraph()
         try:
-            graph.parse(rdflib.StringInputSource(code))
+            graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
         except SAXParseException, err:
             return False
         for row in graph.query('SELECT ?a ?b WHERE { { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
@@ -96,17 +98,6 @@ class libvalidator():
             # a literal
             else:
                 self.result['licensedObjects'][str(row[0])].append(str(row[1]))
-    def extractLicenseInformation(self, code, base):
-        try:
-            code = self.canonicalization(code)
-        except ExpatError, err:
-            return False
-        graph = rdflib.ConjunctiveGraph()
-        try:
-            graph.parse(rdflib.StringInputSource(code))
-        except SAXParseException, err:
-            return False
-        # FIXME body of the method
     def parse(self, code, location = None, headers = None):
         if location is not None:
             self.location = location
@@ -138,56 +129,10 @@ class libvalidator():
         for (base, source) in sources:
             self.extractLicensedObjects(source, base)
         return self.result
-        # aside of the licensed objects, gather information about licenses themselves
-    def parseLicense(self, sample, location):
-        # name, external XHTML, external RDF/XML, embedded
-        # <link rel="alternate" type="application/rdf+xml" href="rdf" />
-        # calculate hashes
-        sample = sample.strip()
-        headers = ''
-        reHyperlink = re.compile('^(?:data:|((ftp|gopher|https?)://))\S+$', re.IGNORECASE)
-        if reHyperlink.search(sample) is not None:
-            # FIXME cache
-            try:
-                opener = URLOpener()
-                filename, headers = opener.retrieve(sample)
-                f = open(filename, 'r')
-                code = f.read()
-                f.close()
-                opener.close()
-                externalLocation = sample
-            except IOError, err:
-                return False
-        else:
-            code = sample
-        soup = BeautifulSoup(code)
-        rel = re.compile('(?:^alternate\s+)|(?:\s+alternate\s+)|(?:^alternate$)|(?:\s+alternate$)', re.IGNORECASE)
-        links = soup.findAll(re.compile('^(?:a|link)$', re.IGNORECASE),
-                             {'rel': rel, 'type': 'application/rdf+xml', 'href': lambda(value): value is not None})
-        licenses = []
-        if len(links) == 0:
-            licenses.append([location, sample])
-        else:
-            element = soup.find('base', {'href': lambda(value): value is not None})
-            reContentLocation = re.compile('(?:^|\s+)Content\-Location\s*:\s*(\S+)', re.IGNORECASE)
-            search = reContentLocation.search(unicode(headers))
-            if element:
-                base = element['href']
-            elif search:
-                base = search.group(1)
-            elif location:
-                base = externalLocation
-            for link in links:
-                try:
-                    url = urlparse.urljoin(self.findBaseForElement(base, link), link['href'])
-                    f = URLOpener().open(url)
-                    if not link['href'].startswith('data:'):
-                        # FIXME ignores the Content-Location in the HTTP header
-                        licenses.append([url, f.read()])
-                    else:
-                        licenses.append([base, f.read()])
-                    f.close()
-                except IOError:
-                    pass
-            for (base, source) in licenses:
-                self.extractLicenseInformation(source, base)
+    def parseLicense(self, uri):
+        try:
+            license = cc.license.selectors.choose('standard').by_uri(uri)
+        except CCLicenseError, err:
+            # alicense might be stated using its title
+            return uri
+        return license

@@ -87,3 +87,7 @@ class TestLicenseParsing():
         self.license['embedded'] = 'data:application/rdf+xml,' + urllib.quote(self.license['plain'])
         # FIXME add an XHTML with an alternative RDF/XML test case
     
+    def test_license(self):
+        self.parser.parseLicense(self.license['external'])
+        raise IOError
+        
