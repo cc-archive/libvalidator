@@ -133,14 +133,15 @@ class libvalidator():
         sources.append([self.baseURI, graph.serialize(format='xml')])
         for row in graph.query('SELECT ?b WHERE { ?a xhv:meta ?b . }', initNs = dict(xhv = self.namespaces['xhv'])):
             try:
-                # FIXME allows opening local files e.g. /etc/passwd (should not be allowed unless testing)
-                f = URLOpener().open(row[0])
-                # FIXME no MIME type detection (we assume it must be application/rdf+xml as yet)
-                if not unicode(row[0]).startswith('data:'):
-                    # FIXME ignores the Content-Location in the HTTP header
-                    sources.append([str(row[0]), f.read()])
-                else:
-                    sources.append([self.baseURI, f.read()])
+                reHyperlink = re.compile('^(?:data:|((ftp|gopher|https?)://))\S+$', re.IGNORECASE)
+                if reHyperlink.search(row[0]) is not None:
+                    f = URLOpener().open(row[0])
+                    # FIXME no MIME type detection (we assume it must be application/rdf+xml as yet)
+                    if not unicode(row[0]).startswith('data:'):
+                        # FIXME ignores the Content-Location in the HTTP header
+                        sources.append([str(row[0]), f.read()])
+                    else:
+                        sources.append([self.baseURI, f.read()])
             except IOError:
                 pass
         for (base, source) in sources:
