@@ -1,8 +1,0 @@
-+ write a complete RDFa equivalent of the RDF/XML from the CC Wiki
-+ generate unit tests that differ in a way of embedding identical RDF data
-+ introduce a way to check the isomorphism of any given RDF graphs (one would
-  be the reference graph and the other would be the outcome of parsing)
-+ alter the users about using deprecated means
-- add utidylib dependencies
-- add cc.license to credits and dependencies
-- support making assertions about the objects

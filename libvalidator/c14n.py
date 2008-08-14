@@ -1,9 +1,6 @@
 #! /usr/bin/env python
 '''XML Canonicalization
 
-Replaced cStringIO and StringIO with a dummy class to resolve the problem with
-Unicode strings.
-
 This module generates canonical XML of a document or element.
     http://www.w3.org/TR/2001/REC-xml-c14n-20010315
 and includes a prototype of exclusive canonicalization
@@ -27,6 +24,10 @@ Authors:
     "Rich Salz" <rsalz@zolera.com>
 
 $Date: 2003/01/25 11:41:21 $ by $Author: loewis $
+
+Update:
+  Replaced cStringIO and StringIO with a dummy class to resolve the problem
+  with Unicode strings. (Hugo Dworak; 2008/08/08 12:00:00)
 '''
 
 _copyright = '''Copyright 2001, Zolera Systems Inc.  All Rights Reserved.
