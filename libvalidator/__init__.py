@@ -20,7 +20,9 @@ class libvalidator():
                            'dc': rdflib.Namespace('http://purl.org/dc/elements/1.1/'),
                            'xhv': rdflib.Namespace('http://www.w3.org/1999/xhtml/vocab#')}
         self.baseURI = ''
-        self.result = {'licensedObjects': {}, 'licenses': {}}
+        self.headers = None
+        self.location = None
+        self.result = {'licensedObjects': {}, 'licenses': {}, 'deprecated': False}
     def findBaseDocument(self):
         # FIXME no CURIE support (low priority)
         # FIXME no xml:base support (low priority)
@@ -28,12 +30,12 @@ class libvalidator():
             if e.hasAttribute('href'):
                 self.baseURI = e.getAttribute('href')
                 return
-        reContentLocation = re.compile('(?:^|\s+)Content\-Location\s*:\s*(\S+)', re.IGNORECASE)
-        search = reContentLocation.search(self.headers)
-        if search:
-            self.baseURI = search.group(1)
-        elif self.location:
-            self.baseURI = self.location
+        if self.headers is not None:
+            header = self.headers.get('Content-Type')
+            if header is not None:
+                self.baseURI = unicode(header)
+                return
+        self.baseURI = self.location
     def findBaseForElement(self, base, element):
         # FIXME no CURIE support (low priority)
         if element.name.lower() == 'object':
@@ -52,6 +54,7 @@ class libvalidator():
                 node = node.parent
         return base
     def canonicalization(self, code):
+        dom = None
         try:
             dom = minidom.parseString(code)
         except ExpatError, err:
@@ -59,26 +62,19 @@ class libvalidator():
         try:
             dom = minidom.parseString(code)
         except ExpatError, err:
-            options = dict(output_xml=1, numeric_entities=1, quote_nbsp=1,
+            options = dict(hide_comments=0, numeric_entities=1, quote_nbsp=1,
                            add_xml_decl=1, indent=0, tidy_mark=0,
                            input_encoding='utf8', output_encoding='ascii',
-                           hide_comments=0)
+                           force_output=1) # output_xml=1
             code = unicode(tidy.parseString(code, **options)).encode('utf-8')
-        try:
+            code = unicode(BeautifulSoup(code)).encode('utf-8')
+        if dom is None:
             dom = minidom.parseString(code)
-        except ExpatError, err:
-            return False
         return unicode(c14n.Canonicalize(dom, comments = True))
     def extractLicensedObjects(self, code, base):
-        try:
-            code = self.canonicalization(code)
-        except ExpatError, err:
-            return False
+        code = self.canonicalization(code)
         graph = rdflib.ConjunctiveGraph()
-        try:
-            graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
-        except SAXParseException, err:
-            return False
+        graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
         for row in graph.query('SELECT ?a ?b WHERE { { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
             try:
                 self.result['licensedObjects'][str(row[0])]
@@ -95,6 +91,10 @@ class libvalidator():
             # an RDF URI reference
             elif isinstance(row[1], rdflib.URIRef):
                 self.result['licensedObjects'][str(row[0])].append(str(row[1]))
+                try:
+                    self.result['licenses'][str(row[1])]
+                except:
+                    self.result['licenses'][str(row[1])] = self.parseLicense(str(row[1]))
             # a literal
             else:
                 self.result['licensedObjects'][str(row[0])].append(str(row[1]))
@@ -104,12 +104,13 @@ class libvalidator():
         if headers is not None:
             self.headers = headers
         self.code = self.canonicalization(code)
-        self.dom = minidom.parseString(self.code)
+        self.dom = minidom.parseString(self.code.encode('utf-8'))
         self.findBaseDocument()
         sources = []
         reRDF = re.compile('<([^\s<>]+)\s+(?:[^>]+\s+)?xmlns(?::[^=]+)?\s*=\s*(?:("http://www\.w3\.org/1999/02/22-rdf-syntax-ns#")|(\'http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#\')).*</\\1\s*>')
         for m in re.finditer(reRDF, code):
             sources.append([self.baseURI, m.group(0)])
+            self.result['deprecated'] = True
         dump = _process_DOM(self.dom, self.location, 'xml', Options(warnings = False, transformers = [DC_transform]))
         graph = rdflib.ConjunctiveGraph()
         graph.parse(rdflib.StringInputSource(dump), format='xml')
@@ -133,6 +134,19 @@ class libvalidator():
         try:
             license = cc.license.selectors.choose('standard').by_uri(uri)
         except CCLicenseError, err:
-            # alicense might be stated using its title
+            # a license might be stated using its title
             return uri
-        return license
+        print license.license_code, license.libre
+        return {'title' : license.title(),
+                'description' : license.description(),
+                'jurisdiction' : license.jurisdiction,
+                'current_version' : license.current_version,
+                'version' : license.version,
+                'superseded' : license.superseded,
+                'requires' : license.requires,
+                'permits' : license.permits,
+                #'prohibits' : license.prohibits,
+                'libre' : license.libre,
+                'license_class' : license.license_class,
+                'license_code' : license.license_code,
+                'uri' : license.uri}

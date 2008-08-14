@@ -4,3 +4,4 @@
   be the reference graph and the other would be the outcome of parsing)
 - add utidylib and cc.license to LICENSE and dependencies
 - support making assertions about the objects
+- alter the users about using deprecated means
