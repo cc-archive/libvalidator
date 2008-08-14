@@ -152,7 +152,6 @@ class libvalidator():
         except CCLicenseError, err:
             # a license might be stated using its title
             return uri
-        print license.license_code, license.libre
         return {'title' : license.title(),
                 'description' : license.description(),
                 'jurisdiction' : license.jurisdiction,
