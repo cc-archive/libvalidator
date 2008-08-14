@@ -2,6 +2,7 @@
 + generate unit tests that differ in a way of embedding identical RDF data
 + introduce a way to check the isomorphism of any given RDF graphs (one would
   be the reference graph and the other would be the outcome of parsing)
-- add utidylib and cc.license to LICENSE and dependencies
++ alter the users about using deprecated means
+- add utidylib dependencies
+- add cc.license to credits and dependencies
 - support making assertions about the objects
-- alter the users about using deprecated means
