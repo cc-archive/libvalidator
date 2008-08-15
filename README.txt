@@ -1,12 +1,20 @@
 Installation and Setup
 ======================
 
-libvalidator depends on a package that has to be installed manually: uTidylib.
-It is provided in a Ubuntu package named python-utidylib.
+The following instructions apply to Ubuntu 8.04 Hardy Heron.
 
-For more information visit: http://utidylib.berlios.de/
-
-Moreover, the required package cc.license requires Redland itself, which can
-be found in the Ubuntu package named python-librdf.
-
-For more information visit: http://librdf.org/
+$ sudo apt-get install python-utidylib python-librdf python-setuptools python-lxml python-zopeinterface
+$ sudo easy_install zc.buildout virtualenv
+$ mkdir ~/deploy
+$ cd ~/deploy
+$ git clone git://code.creativecommons.org/libvalidator.git
+$ cd libvalidator
+$ git submodule init
+$ git submodule update
+$ virtualenv --no-site-packages .
+$ python bootstrap/bootstrap.py
+$ buildout
+$ buildout install
+$ python setup.py bdist_egg
+$ sudo easy_install eggs/pyRdfa-2.0-py2.5.egg dist/libvalidator-0.0.0-py2.5.egg
+$ nosetests
