@@ -8,8 +8,6 @@ setup(
                       'html5lib',
                       'rdflib == 2.4.0',
                       'pyRdfa',
-                      'chardet',
-                      'BeautifulSoup',
                       'cc.license'
                       ],
     packages=find_packages(exclude=['ez_setup',]),
