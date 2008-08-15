@@ -10,7 +10,6 @@ setup(
                       'pyRdfa',
                       'chardet',
                       'BeautifulSoup',
-                      'lxml',
                       'cc.license'
                       ],
     packages=find_packages(exclude=['ez_setup',]),
