@@ -3,7 +3,7 @@ Installation and Setup
 
 The following instructions apply to Ubuntu 8.04 Hardy Heron.
 
-$ sudo apt-get install python-librdf python-setuptools python-lxml python-zopeinterface
+$ sudo apt-get install python-setuptools python-librdf python-lxml
 $ sudo easy_install zc.buildout virtualenv
 $ mkdir ~/deploy
 $ cd ~/deploy
@@ -16,5 +16,6 @@ $ python bootstrap/bootstrap.py
 $ buildout
 $ buildout install
 $ python setup.py bdist_egg
-$ sudo easy_install eggs/pyRdfa-2.0-py2.5.egg dist/libvalidator-0.0.0-py2.5.egg
+$ sudo easy_install eggs/pyRdfa-2.0-py2.5.egg
+$ sudo easy_install dist/libvalidator-0.0.0-py2.5.egg
 $ nosetests
