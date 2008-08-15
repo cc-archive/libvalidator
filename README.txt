@@ -3,7 +3,7 @@ Installation and Setup
 
 The following instructions apply to Ubuntu 8.04 Hardy Heron.
 
-$ sudo apt-get install python-utidylib python-librdf python-setuptools python-lxml python-zopeinterface
+$ sudo apt-get install python-librdf python-setuptools python-lxml python-zopeinterface
 $ sudo easy_install zc.buildout virtualenv
 $ mkdir ~/deploy
 $ cd ~/deploy
