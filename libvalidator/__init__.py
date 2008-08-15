@@ -91,7 +91,6 @@ class libvalidator():
         code = self.canonicalization(code)
         graph = rdflib.ConjunctiveGraph()
         graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
-        print code
         for row in graph.query('SELECT ?a ?b WHERE { { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
             if not self.result['licensedObjects'].has_key(str(row[0])):
                 self.result['licensedObjects'][str(row[0])] = []
@@ -143,7 +142,6 @@ class libvalidator():
                 pass
         for (base, source) in sources:
             self.extractLicensedObjects(source, base)
-        print self.result
         return self.result
     def parseLicense(self, uri):
         try:
