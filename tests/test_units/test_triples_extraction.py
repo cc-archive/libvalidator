@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Hugo Dworak <http://hugo.dworak.info>'
-__license__ = """Copyright (C) 2008  Hugo Dworak
+__author__ = 'Hugo Dworak <http://hugo.dworak.info/> and Creative Commons <http://creativecommons.org/>'
+__license__ = """Copyright (C) 2008  Hugo Dworak and Creative Commons
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published

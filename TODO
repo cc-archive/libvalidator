@@ -6,6 +6,7 @@
 
 - cc:morePermissions (URI), cc:jurisdiction (URI), cc:legalcode (URI)
 - cc:deprecatedOn (date)
+- display prohibitions, requirements, and permissions via cc.license
 - validate the URIs appearing in the license information
 - CURIE support (might be pyRdfa dependent)
 - xml:base support (might be pyRdfa dependent)

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='libvalidator',
-    author='Hugo Dworak',
+    author='Hugo Dworak and Creative Commons',
     install_requires=['setuptools',
                       'nose',
                       'html5lib',
