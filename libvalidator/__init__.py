@@ -155,6 +155,7 @@ class libvalidator():
                 'current_version' : license.current_version,
                 'version' : license.version,
                 'superseded' : license.superseded,
+                'deprecated' : license.deprecated,
                 'requires' : license.requires,
                 'permits' : license.permits,
                 #'prohibits' : license.prohibits,
