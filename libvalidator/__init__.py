@@ -23,7 +23,6 @@ from pyRdfa import _process_DOM, Options
 from pyRdfa.transform.DublinCore import DC_transform
 import rdflib
 import cc.license
-from cc.license.lib.exceptions import CCLicenseError
 
 class URLOpener(urllib.FancyURLopener):
     def http_error_404(*args, **kwargs):
@@ -119,7 +118,7 @@ class libvalidator():
     def parseLicense(self, uri):
         try:
             license = cc.license.selectors.choose('standard').by_uri(uri)
-        except CCLicenseError, err:
+        except cc.license.CCLicenseError, err:
             # a license might be stated using its title
             return uri
         return {'title' : license.title(),
