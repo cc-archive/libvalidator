@@ -1,0 +1,18 @@
+- DC:title (for licensed objects)
+- cc:attributionName, cc:attributionURL (URI)
+- cc:attributionName
+- code documentation (like the one in pyRdfa)
+- cc-devel and labs summary of what was achieved
+
+- cc:morePermissions (URI), cc:jurisdiction (URI), cc:legalcode (URI)
+- cc:deprecatedOn (date)
+- validate the URIs appearing in the license information
+- CURIE support (might be pyRdfa dependent)
+- xml:base support (might be pyRdfa dependent)
+- take Content-Location into account when calculating the document base URI
+- validate the factual accuracy <cc:License> blocks in deprecated RDF/XML
+- parse syntax other than RDF/XML and RDFa (Notation 3, Turtle, N-Triples)
+- parse multimedia files (liblicense)
+- parse RSS (feedparser?)
+- MIME type detection and overriding
+- developer manual with diagrams (UML?)
