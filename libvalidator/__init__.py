@@ -91,10 +91,9 @@ class libvalidator():
         code = self.canonicalization(code)
         graph = rdflib.ConjunctiveGraph()
         graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
+        print code
         for row in graph.query('SELECT ?a ?b WHERE { { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
-            try:
-                self.result['licensedObjects'][str(row[0])]
-            except:
+            if not self.result['licensedObjects'].has_key(str(row[0])):
                 self.result['licensedObjects'][str(row[0])] = []
             # a blank node
             if isinstance(row[1], rdflib.BNode):
@@ -107,14 +106,12 @@ class libvalidator():
             # an RDF URI reference
             elif isinstance(row[1], rdflib.URIRef):
                 self.result['licensedObjects'][str(row[0])].append(str(row[1]))
-                try:
-                    self.result['licenses'][str(row[1])]
-                except:
+                if not self.result['licenses'].has_key(str(row[1])):
                     self.result['licenses'][str(row[1])] = self.parseLicense(str(row[1]))
             # a literal
             else:
                 self.result['licensedObjects'][str(row[0])].append(str(row[1]))
-    def parse(self, code, location = None, headers = None):
+    def parse(self, code, location = None, headers = None, openLocalFiles = False):
         if location is not None:
             self.location = location
         if headers is not None:
@@ -134,7 +131,7 @@ class libvalidator():
         for row in graph.query('SELECT ?b WHERE { ?a xhv:meta ?b . }', initNs = dict(xhv = self.namespaces['xhv'])):
             try:
                 reHyperlink = re.compile('^(?:data:|((ftp|gopher|https?)://))\S+$', re.IGNORECASE)
-                if reHyperlink.search(row[0]) is not None:
+                if openLocalFiles == True or reHyperlink.search(row[0]) is not None:
                     f = URLOpener().open(row[0])
                     # FIXME no MIME type detection (we assume it must be application/rdf+xml as yet)
                     if not unicode(row[0]).startswith('data:'):
@@ -146,6 +143,7 @@ class libvalidator():
                 pass
         for (base, source) in sources:
             self.extractLicensedObjects(source, base)
+        print self.result
         return self.result
     def parseLicense(self, uri):
         try:

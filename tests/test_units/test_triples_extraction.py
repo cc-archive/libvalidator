@@ -202,7 +202,7 @@ class TestTriplesExtraction():
         else:
             head.appendChild(link)
     def parse(self):
-        self.result = self.parser.parse(self.document.toxml(), self.baseURI)
+        self.result = self.parser.parse(self.document.toxml(), self.baseURI, None, True)
     def assert_external(self):
         assert 'http://artlibre.org/licence/lal/en/' in self.result['licensedObjects']['http://example.org/gnomophone.mp3'] \
            and 'http://creativecommons.org/licenses/by-nc-nd/2.0/' in self.result['licensedObjects']['http://example.org/gnomophone.mp3']
