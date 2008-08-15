@@ -58,9 +58,9 @@ class libvalidator():
         except:
             parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder('dom'))
             dom = parser.parse(code)
-        return dom.toxml()
+        return (dom, dom.toxml())
     def extractLicensedObjects(self, code, base):
-        code = self.formDocument(code)
+        (dom, code) = self.formDocument(code)
         graph = rdflib.ConjunctiveGraph()
         graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
         for row in graph.query('SELECT ?a ?b WHERE { { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
@@ -89,8 +89,7 @@ class libvalidator():
             self.location = location
         if headers is not None:
             self.headers = headers
-        self.code = self.formDocument(code)
-        self.dom = minidom.parseString(self.code.encode('utf-8'))
+        (self.dom, self.code) = self.formDocument(code)
         self.findBaseDocument()
         sources = []
         reRDF = re.compile('<([^\s<>]+)\s+(?:[^>]+\s+)?xmlns(?::[^=]+)?\s*=\s*(?:("http://www\.w3\.org/1999/02/22-rdf-syntax-ns#")|(\'http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#\')).*</\\1\s*>')
