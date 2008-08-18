@@ -52,6 +52,11 @@ class libvalidator():
                 return
         self.baseURI = self.location
     def formDocument(self, code):
+        reCDATA = re.compile(r'<!\[CDATA\[((?:[^\]]+|\](?!\]>))*)\]\]>')
+        for m in re.finditer(reCDATA, code):
+            code = code.replace(m.group(0), m.group(1).replace('&', '&amp;') \
+                                                      .replace('<', '&lt;') \
+                                                      .replace('>', '&gt;'))
         dom = None
         try:
             dom = minidom.parseString(code)
@@ -61,7 +66,6 @@ class libvalidator():
         return (dom, dom.toxml())
     def extractLicensedObjects(self, code, base):
         (dom, code) = self.formDocument(code)
-        print code
         graph = rdflib.ConjunctiveGraph()
         graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
         for row in graph.query('SELECT ?a ?b WHERE { { ?a old:license ?b } UNION { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(old = self.namespaces['old'], cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
@@ -131,8 +135,8 @@ class libvalidator():
                 'version' : license.version,
                 'superseded' : license.superseded,
                 'deprecated' : license.deprecated,
-                'requires' : license.requires,
-                'permits' : license.permits,
+                #'requires' : license.requires,
+                #'permits' : license.permits,
                 #'prohibits' : license.prohibits,
                 'libre' : license.libre,
                 'license_class' : license.license_class,
