@@ -30,7 +30,8 @@ class URLOpener(urllib.FancyURLopener):
 
 class libvalidator():
     def __init__(self, *args, **kargs):
-        self.namespaces = {'cc': rdflib.Namespace('http://web.resource.org/cc/'),
+        self.namespaces = {'old': rdflib.Namespace('http://web.resource.org/cc/'),
+                           'cc': rdflib.Namespace('http://creativecommons.org/ns#'),
                            'dc': rdflib.Namespace('http://purl.org/dc/elements/1.1/'),
                            'xhv': rdflib.Namespace('http://www.w3.org/1999/xhtml/vocab#')}
         self.baseURI = ''
@@ -62,7 +63,7 @@ class libvalidator():
         (dom, code) = self.formDocument(code)
         graph = rdflib.ConjunctiveGraph()
         graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
-        for row in graph.query('SELECT ?a ?b WHERE { { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
+        for row in graph.query('SELECT ?a ?b WHERE { { ?a old:license ?b } UNION { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(old = self.namespaces['old'], cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
             if not self.result['licensedObjects'].has_key(str(row[0])):
                 self.result['licensedObjects'][str(row[0])] = []
             # a blank node
@@ -91,7 +92,7 @@ class libvalidator():
         (self.dom, self.code) = self.formDocument(code)
         self.findBaseDocument()
         sources = []
-        reRDF = re.compile('<([^\s<>]+)\s+(?:[^>]+\s+)?xmlns(?::[^=]+)?\s*=\s*(?:("http://www\.w3\.org/1999/02/22-rdf-syntax-ns#")|(\'http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#\')).*</\\1\s*>')
+        reRDF = re.compile('<([^\s<>]+)\s+(?:[^>]+\s+)?xmlns(?::[^=]+)?\s*=\s*(?:("http://www\.w3\.org/1999/02/22-rdf-syntax-ns#")|(\'http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#\')).*</\\1\s*>', re.DOTALL)
         for m in re.finditer(reRDF, code):
             sources.append([self.baseURI, m.group(0)])
             self.result['deprecated'] = True
