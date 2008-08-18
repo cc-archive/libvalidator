@@ -76,11 +76,12 @@ class libvalidator():
                 pass
             # an RDF URI reference
             elif isinstance(row[1], rdflib.URIRef):
-                self.result['licensedObjects'][str(row[0])].append(str(row[1]))
-                if not self.result['licenses'].has_key(str(row[1])):
-                    license = self.parseLicense(str(row[1]))
-                    if license != str(row[1]):
-                        self.result['licenses'][str(row[1])] = self.parseLicense(str(row[1]))
+                if str(row[1]) not in self.result['licensedObjects'][str(row[0])]:
+                    self.result['licensedObjects'][str(row[0])].append(str(row[1]))
+                    if not self.result['licenses'].has_key(str(row[1])):
+                        license = self.parseLicense(str(row[1]))
+                        if license != str(row[1]):
+                            self.result['licenses'][str(row[1])] = self.parseLicense(str(row[1]))
             # a literal
             else:
                 self.result['licensedObjects'][str(row[0])].append(str(row[1]))
