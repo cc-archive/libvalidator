@@ -61,6 +61,7 @@ class libvalidator():
         return (dom, dom.toxml())
     def extractLicensedObjects(self, code, base):
         (dom, code) = self.formDocument(code)
+        print code
         graph = rdflib.ConjunctiveGraph()
         graph.parse(rdflib.StringInputSource(code.encode('utf-8')))
         for row in graph.query('SELECT ?a ?b WHERE { { ?a old:license ?b } UNION { ?a cc:license ?b } UNION { ?a xhv:license ?b } UNION { ?a dc:rights ?b } UNION { ?a dc:rights.license ?b } }', initNs = dict(old = self.namespaces['old'], cc = self.namespaces['cc'], dc = self.namespaces['dc'], xhv = self.namespaces['xhv'])):
@@ -93,7 +94,7 @@ class libvalidator():
         (self.dom, self.code) = self.formDocument(code)
         self.findBaseDocument()
         sources = []
-        reRDF = re.compile('<([^\s<>]+)\s+(?:[^>]+\s+)?xmlns(?::[^=]+)?\s*=\s*(?:("http://www\.w3\.org/1999/02/22-rdf-syntax-ns#")|(\'http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#\')).*</\\1\s*>', re.DOTALL)
+        reRDF = re.compile('<([^\s<>]+)\s+(?:[^>]+\s+)?xmlns(?::[^=]+)?\s*=\s*(?:("http://www\.w3\.org/1999/02/22-rdf-syntax-ns#")|(\'http://www\.w3\.org/1999/02/22\-rdf\-syntax\-ns#\')).*?</\\1\s*>', re.DOTALL)
         for m in re.finditer(reRDF, code):
             sources.append([self.baseURI, m.group(0)])
             self.result['deprecated'] = True
