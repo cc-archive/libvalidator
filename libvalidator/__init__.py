@@ -28,7 +28,7 @@ class URLOpener(urllib.FancyURLopener):
     def http_error_404(*args, **kwargs):
         raise IOError
 
-class libvalidator():
+class libvalidator(object):
     def __init__(self, *args, **kargs):
         self.namespaces = {'old': rdflib.Namespace('http://web.resource.org/cc/'),
                            'cc': rdflib.Namespace('http://creativecommons.org/ns#'),
