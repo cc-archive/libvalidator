@@ -8,6 +8,7 @@ $ sudo aptitude install libxml2-dev libxslt1-dev python-librdf python-setuptools
 $ mkdir -p ~/.python/lib/python2.5/site-packages ~/deploy
 $ export PYTHONPATH="$PYTHONPATH:$HOME/.python/lib/python2.5/site-packages/"
 $ export PATH="$PATH:$HOME/.python/bin"
+$ export PYTHON_EGG_CACHE="$HOME/.python/cache"
 $ cd ~/deploy
 $ easy_install --install-dir ~/.python/lib/python2.5/site-packages \
   --prefix ~/.python virtualenv zc.buildout
