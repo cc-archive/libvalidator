@@ -46,7 +46,7 @@ class libvalidator(object):
                 self.baseURI = e.getAttribute('href')
                 return
         if self.headers is not None:
-            header = self.headers.get('Content-Type')
+            header = self.headers.get('Content-Location')
             if header is not None:
                 self.baseURI = unicode(header)
                 return
