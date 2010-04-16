@@ -1,19 +1,35 @@
-
 Developing
 ==========
 
-``libvalidator`` uses `buildout`_ for managing the build and
-deployment process.  After checking out the ``libvalidator``
-repository, do the following to begin developing it::
+The following instructions apply to the minimal installation of Ubuntu 9.10.
+See <https://help.ubuntu.com/community/Installation/MinimalCD> for details.
 
-  $ cd libvalidator
-  $ python bootstrap.py
+To begin with, you need to install the required packages::
+
+  $ sudo apt-get -y install gcc git-core libxslt-dev python-dev python-librdf
+
+Aside of these packages, the following dependencies will also be installed:
+binutils gcc-4.4 libc-dev-bin libc6-dev libdigest-sha1-perl liberror-perl
+libgomp1 libmysqlclient16 libpq5 libpython2.6 libraptor1 librasqal1 librdf0
+libxml2-dev libxslt1-dev libxslt1.1 linux-libc-dev mysql-common patch
+python2.6-dev raptor-utils redland-utils zlib1g-dev
+
+These packages require approximately 79.7 MB (in case of the minimal
+installation) and 29.0 MB (in case of the standard installation).
+
+It is now time to pull the source code from the repositories hosted by
+Creative Commons::
+
+  $ mkdir ~/deploy
+  $ cd ~/deploy
+  $ git clone git://code.creativecommons.org/libvalidator.git
+  $ cd ./libvalidator
+
+Once you have retrieved both repositories, you can build ``validator``
+using the development configuration::
+
+  $ python ./bootstrap.py
   $ ./bin/buildout
-
-Buildout will install the dependencies needed to work with
-libvalidator.  You may need additional libraries installed in order to
-build some of the dependencies.  On Ubuntu these include libxml2-dev,
-libxslt1-dev, python-librdf, and python-dev.
 
 Testing
 =======
@@ -33,5 +49,5 @@ using easy_install, pip, or another method::
   $ easy_install ./dist/libvalidator-0.0.0-py2.6.egg
 
 The specific egg filename may differ based on the version of
-libvalidator and Python you are using.
+Python and ``libvalidator`` you are using.
 
