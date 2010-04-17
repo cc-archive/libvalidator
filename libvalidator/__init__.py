@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Hugo Dworak <http://hugo.dworak.info/> and Creative Commons <http://creativecommons.org/>'
-__license__ = """Copyright (C) 2008  Hugo Dworak and Creative Commons
+""" The core of the library.
+
+Copyright (C) 2008, 2009, 2010 Robert Gust‐Bardon and Creative Commons.
+Originally contributed by Robert Gust‐Bardon.
+
+This file is part of the License Validation Library.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published
@@ -13,7 +17,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>."""
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import re, os, urlparse, urllib
 from xml.dom import minidom
@@ -23,6 +28,16 @@ from pyRdfa import _process_DOM, Options
 from pyRdfa.transform.DublinCore import DC_transform
 import rdflib
 import cc.license
+
+__author__ = "Robert Gust‐Bardon and Creative Commons"
+__copyright__ = ("Copyright 2008, 2009, 2010 "
+                 "Robert Gust‐Bardon and Creative Commons")
+__credits__ = ["Robert Gust‐Bardon", "Asheesh Laroia"]
+__license__ = ("GNU Lesser General Public License Version 3 "
+               "or any later version")
+__version__ = "0.1.0"
+__maintainer__ = "Robert Gust‐Bardon"
+__status__ = "Beta"
 
 class URLOpener(urllib.FancyURLopener):
     def http_error_404(*args, **kwargs):

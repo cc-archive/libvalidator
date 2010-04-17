@@ -10,7 +10,7 @@ dist
 eggs
 lib
 include
-libvalidator.egg-info
+*.egg-info
 libvalidator.db
 .coverage
 .installed.cfg

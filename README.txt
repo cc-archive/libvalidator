@@ -1,6 +1,11 @@
 Developing
 ==========
 
+Please note that it is not required to follow the instructions below in other
+to run the ``validator``.  If all you want is to run the Web application,
+follow the instructions found in the ``README.txt`` file within the
+``validator``.
+
 The following instructions apply to the minimal installation of Ubuntu 9.10.
 See <https://help.ubuntu.com/community/Installation/MinimalCD> for details.
 
