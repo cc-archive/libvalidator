@@ -28,11 +28,11 @@ Creative Commons::
   $ mkdir ~/deploy
   $ cd ~/deploy
   $ git clone git://code.creativecommons.org/libvalidator.git
-  $ cd ./libvalidator
 
-Once you have retrieved both repositories, you can build ``validator``
+Once you have retrieved both repositories, you can build ``libvalidator``
 using the development configuration::
 
+  $ cd ./libvalidator
   $ python ./bootstrap.py
   $ ./bin/buildout
 

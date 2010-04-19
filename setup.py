@@ -4,7 +4,7 @@
 Copyright (C) 2008, 2009, 2010 Robert Gust‐Bardon and Creative Commons.
 Originally contributed by Asheesh Laroia.
 
-This file is part of the License Validation Library.
+This file is a part of the License Validation Library.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published
