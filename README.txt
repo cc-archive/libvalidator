@@ -19,8 +19,8 @@ libgomp1 libmysqlclient16 libpq5 libpython2.6 libraptor1 librasqal1 librdf0
 libxml2-dev libxslt1-dev libxslt1.1 linux-libc-dev mysql-common patch
 python2.6-dev raptor-utils redland-utils zlib1g-dev
 
-These packages require approximately 79.7 MB (in case of the minimal
-installation) and 29.0 MB (in case of the standard installation).
+These packages require approximately 79.7 MiB (in case of the minimal
+installation) and 29.0 MiB (in case of the standard installation).
 
 It is now time to pull the source code from the repositories hosted by
 Creative Commons::
@@ -48,11 +48,32 @@ Installing
 ==========
 
 To install ``libvalidator``, first build the egg, and then install it
-using easy_install, pip, or another method::
+using easy_install, pip, or another method.  If you choose the easy_install
+method, you need to install python-setuptools and python-pkg-resources
+(1.1 MiB in total) first::
+
+  $ sudo apt-get -y install python-setuptools
+
+Then you need to hatch the egg of ``libvalidator``::
 
   $ ./bin/python setup.py bdist_egg
-  $ easy_install ./dist/libvalidator-0.0.0-py2.6.egg
 
-The specific egg filename may differ based on the version of
-Python and ``libvalidator`` you are using.
+What follows depends on whether you would like to have a system-wide
+installation or not.  In case of a system-wide installation, all you need
+to do is to issue the following command::
+
+  $ sudo easy_install -f ./eggs/ dist/*
+
+However, when it comes to the local availability of the egg, you need
+to set up the environment first::
+
+  $ mkdir -p ~/.python/bin  ~/.python/cache ~/.python/lib/site-packages
+  $ export PATH="$PATH:$HOME/.python/bin"
+  $ export PYTHON_EGG_CACHE="$HOME/.python/cache"
+  $ export PYTHONPATH="$PYTHONPATH:$HOME/.python/lib/site-packages/"
+
+Afterwards, install the library in the following manner::
+
+  $ easy_install --install-dir ~/.python/lib/site-packages \
+                 --prefix ~/.python -f ./eggs/ dist/*
 
