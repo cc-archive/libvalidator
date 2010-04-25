@@ -59,8 +59,8 @@ class libvalidator(object):
             'dc': rdflib.Namespace('http://purl.org/dc/elements/1.1/'),
             'xhv': rdflib.Namespace('http://www.w3.org/1999/xhtml/vocab#')
         }
-        # The base URI of the document that is being parsed
-        self.baseURI = ''
+        # The base IRI of the document that is being parsed
+        self.base = ''
         # The headers that were sent along with the document that is
         # being parsed
         self.headers = None
@@ -74,24 +74,24 @@ class libvalidator(object):
         }
 
     def findBaseDocument(self):
-        """Establish the URL that will be used when the translation of
-           a relative URL into an absolute URL will occur."""
-        # FIXME no CURIE support (low priority)
-        # FIXME no xml:base support (low priority)
+        """Establish the IRI that will be used when the translation of
+           a relative IRI into an absolute IRI will occur."""
+        # FIXME There is no support for CURIEs.
+        # FIXME There is no support for ``xml:base``.
         for e in self.dom.getElementsByTagName('base'):
             if e.hasAttribute('href'):
-                self.baseURI = e.getAttribute('href')
+                self.base = e.getAttribute('href')
                 return
         if self.headers is not None:
             header = self.headers.get('Content-Location')
             if header is not None:
-                self.baseURI = unicode(header)
+                self.base = unicode(header)
                 return
-        self.baseURI = self.location
+        self.base = self.location
 
     def formDocument(self, code):
-        """Parse the source code written in HTML or XHTML in order to
-           obtain a DOM tree."""
+        """Parse the source code written in RDF/XML, HTML, or XHTML in
+           order to obtain a DOM tree."""
         # Translate CDATA blocks into PCDATA blocks.
         reCDATA = re.compile(r'<!\[CDATA\[((?:[^\]]+|\](?!\]>))*)\]\]>')
         for m in re.finditer(reCDATA, code):
@@ -116,7 +116,7 @@ class libvalidator(object):
         # FIXME When it comes to RDF, the name of method is misleading,
         #       because subjects are licensed, not objects (cf. the RDF
         #       triple).
-        # FIXME The base URL is not used at all in this method.
+        # FIXME The base IRI is not used at all in this method.
         # Obtain a DOM tree and a well-formed document given a
         # document written in RDF/XML.
         (dom, code) = self.formDocument(code)
@@ -182,7 +182,8 @@ class libvalidator(object):
                                 self.parseLicense(str(row[1]))
             # Case 3: the object is a literal.
             else:
-                self.result['licensedObjects'][str(row[0])].append(str(row[1]))
+                self.result['licensedObjects'][str(row[0])].\
+                     append(str(row[1]))
 
     def parse(self, code, location = None, headers = None,
               openLocalFiles = False):
@@ -197,7 +198,7 @@ class libvalidator(object):
         # Parse the source code and obtains a DOM tree and well-formed
         # source code without any CDATA blocks.
         (self.dom, self.code) = self.formDocument(code)
-        # Establish the base URI for the document.
+        # Establish the base IRI for the document.
         self.findBaseDocument()
         # The following list stores all the documents written in
         # RDF/XML that are meant to be processed in order to retrieve
@@ -228,7 +229,7 @@ class libvalidator(object):
             '</\\1\s*>'
             , re.DOTALL)
         for m in re.finditer(reRDF, code):
-            sources.append([self.baseURI, m.group(0)])
+            sources.append([self.base, m.group(0)])
             # FIXME The element should only be classified as
             #       deprecated in case it actually contains license
             #       information.
@@ -246,7 +247,7 @@ class libvalidator(object):
         graph.parse(rdflib.StringInputSource(dump), format='xml')
         # Append the document written in RDF/XML to the list of
         # documents to be processed.
-        sources.append([self.baseURI, graph.serialize(format='xml')])
+        sources.append([self.base, graph.serialize(format='xml')])
         # Iterate over the objects that provide metadata about the
         # document that is being analysed.
         for row in graph.query('SELECT ?b WHERE { ?a xhv:meta ?b . }',
@@ -268,7 +269,7 @@ class libvalidator(object):
                         #       ignored.
                         sources.append([str(row[0]), f.read()])
                     else:
-                        sources.append([self.baseURI, f.read()])
+                        sources.append([self.base, f.read()])
             except IOError:
                 pass
         # Extract the license information from all the collected
@@ -277,15 +278,15 @@ class libvalidator(object):
             self.extractLicensedObjects(source, base)
         return self.result
 
-    def parseLicense(self, uri):
+    def parseLicense(self, iri):
         """Employ cc.license in order to obtain additional information
-           about a license that is stated using a URI."""
+           about a license that is stated using an IRI."""
         try:
-            license = cc.license.selectors.choose('standard').by_uri(uri)
+            license = cc.license.selectors.choose('standard').by_uri(iri)
         except cc.license.CCLicenseError, err:
-            # Return the original URI, should no data on the license
+            # Return the original IRI, should no data on the license
             # be available through cc.license.
-            return uri
+            return iri
         # Note: ``requires``, ``permits``, and ``prohibits`` were
         #       originally not used due to a bug in cc.license.
         return {'title' : license.title(),
