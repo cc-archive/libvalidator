@@ -76,4 +76,3 @@ Afterwards, install the library in the following manner::
 
   $ easy_install --install-dir ~/.python/lib/site-packages \
                  --prefix ~/.python -f ./eggs/ dist/*
-
