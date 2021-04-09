@@ -3,7 +3,7 @@ Developing
 
 Please note that it is not required to follow the instructions below in other
 to run the ``validator``.  If all you want is to run the Web application,
-follow the instructions found in the ``README.txt`` file within the
+follow the instructions found in the ``README.rst`` file within the
 ``validator``.
 
 The following instructions apply to the minimal installation of Ubuntu 9.10.
@@ -27,7 +27,7 @@ Creative Commons::
 
   $ mkdir ~/deploy
   $ cd ~/deploy
-  $ git clone git://code.creativecommons.org/libvalidator.git
+  $ git clone git@github.com:cc-archive/libvalidator.git
 
 Once you have retrieved both repositories, you can build ``libvalidator``
 using the development configuration::
